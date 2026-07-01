@@ -56,7 +56,6 @@ E vou continuar te amando por toda a minha vida. ❤️
 // MENSAGENS DE AMOR (SUAS)
 // ==============================
 const mensagensAmor = [
-const mensagensAmor = [
 
 "🌹 Bom dia, meu amor. Espero que seu dia seja tão lindo quanto o sorriso que você coloca no rosto do Henrique todos os dias. Eu te amo infinitamente. ❤️",
 
@@ -117,8 +116,6 @@ const mensagensAmor = [
 "🥹 Se o coração do Henrique pudesse falar, ele repetiria o seu nome o dia inteiro. ❤️",
 
 "💍 Aurora... você sempre será o amor da vida do Henrique, hoje, amanhã e para sempre. Eu te amo infinitamente. ❤️"
-
-];
 ];
 
 // ==============================
@@ -156,7 +153,9 @@ async function enviarAmor() {
 
   const embed = new EmbedBuilder()
     .setColor("#ff4d88")
-    .setTitle("💖 Amor do Henrique 💖")
+.setTitle("💌 Uma cartinha de amor do Henrique")
+.setFooter({
+    text: "❤️ Feito com todo amor para Aurora ❤️"
     .setDescription(
       FRASE_GRANDE +
       "\n\n" +
@@ -200,7 +199,7 @@ client.once(Events.ClientReady, () => {
 client.on(Events.MessageCreate, async message => {
   if (message.author.bot) return;
 
-  if (message.content === "!amor") {
+if (message.content.trim().toLowerCase() === "!amor") {
     const canal = await client.channels.fetch(CANAL_AMOR_ID).catch(() => null);
     if (!canal) return;
 
