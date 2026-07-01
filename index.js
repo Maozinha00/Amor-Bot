@@ -23,14 +23,33 @@ const DATA_INICIO = new Date("2026-01-22");
 // FRASE GRANDE FIXA
 // ==============================
 const FRASE_GRANDE = `
-💖💖💖💖💖💖💖💖💖💖💖💖💖
+const FRASE_GRANDE = `
+💖━━━━━━━━━━━━━━━━━━━━━━━━━━━━💖
 
-🌹 AURORA, ISSO É IMPORTANTE:
+🌹 Meu amor Aurora...
 
-O HENRIQUE TE AMA DE UMA FORMA QUE NÃO CABE EM PALAVRAS.
-DESDE O PRIMEIRO DIA ATÉ HOJE, VOCÊ É O AMOR DA VIDA DELE.
+Se você estiver lendo isso agora, quero que saiba de uma coisa:
 
-💖💖💖💖💖💖💖💖💖💖💖💖💖
+Você é o melhor presente que a vida já me deu.
+Desde que você entrou na minha vida, tudo ganhou mais cor, mais paz e mais sentido.
+
+Obrigado por existir.
+Obrigado por cuidar do meu coração.
+Obrigado por ser exatamente quem você é.
+
+Eu prometo continuar escolhendo você todos os dias.
+Nos dias fáceis.
+Nos difíceis.
+Nos momentos felizes.
+E até quando a vida tentar nos testar.
+
+Você é meu lar, meu sorriso favorito, minha paz e o amor da minha vida.
+
+Eu te amo hoje.
+Vou te amar amanhã.
+E vou continuar te amando por toda a minha vida. ❤️
+
+💖━━━━━━━━━━━━━━━━━━━━━━━━━━━━💖
 `;
 
 // ==============================
