@@ -23,7 +23,6 @@ const DATA_INICIO = new Date("2026-01-22");
 // FRASE GRANDE FIXA
 // ==============================
 const FRASE_GRANDE = `
-const FRASE_GRANDE = `
 💖━━━━━━━━━━━━━━━━━━━━━━━━━━━━💖
 
 🌹 Meu amor Aurora...
@@ -156,6 +155,7 @@ async function enviarAmor() {
 .setTitle("💌 Uma cartinha de amor do Henrique")
 .setFooter({
     text: "❤️ Feito com todo amor para Aurora ❤️"
+      })
     .setDescription(
       FRASE_GRANDE +
       "\n\n" +
