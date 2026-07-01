@@ -56,36 +56,69 @@ E vou continuar te amando por toda a minha vida. ❤️
 // MENSAGENS DE AMOR (SUAS)
 // ==============================
 const mensagensAmor = [
-"💖 Bom dia, Aurora! Henrique acordou pensando em você. Que seu dia seja tão lindo quanto o seu sorriso. ❤️",
-"🌹 Aurora, amar você é a melhor escolha que Henrique fez na vida. 💕",
-"🥰 Você é o primeiro pensamento do Henrique ao acordar e o último antes de dormir. ❤️",
-"💞 Aurora, seu abraço é o lugar favorito do Henrique no mundo inteiro.",
-"✨ Henrique ama cada detalhe em você e se apaixona um pouco mais todos os dias. 💖",
-"🌸 Aurora, você é a paz que o coração do Henrique sempre procurou. ❤️",
-"💘 Não importa o que aconteça, Henrique sempre vai escolher amar você. 💕",
-"🌺 Aurora, sua felicidade é a maior felicidade do Henrique. ❤️",
-"💕 Henrique tem orgulho de chamar você de amor da vida dele.",
-"❤️ Aurora, você transformou a vida do Henrique em um lugar muito mais bonito.",
-"💝 Henrique faria mil vezes o mesmo caminho só para encontrar você novamente.",
-"🌷 Aurora, você é a razão dos melhores sorrisos do Henrique. ❤️",
-"💖 Henrique acredita que o destino sorriu no dia em que colocou você em sua vida.",
-"🥹 Aurora, seu carinho faz o coração do Henrique transbordar de felicidade. ❤️",
-"🌹 Henrique promete amar você em todos os dias, nos bons e nos difíceis. 💕",
-"💞 Aurora, seu amor é o maior presente que Henrique já recebeu.",
-"✨ Henrique não precisa de mais nada quando tem você ao lado dele. ❤️",
-"💕 Aurora, você é o sonho mais bonito que a vida realizou para Henrique.",
-"❤️ Henrique ama seu jeitinho, sua voz, seu sorriso e tudo o que faz você ser única.",
-"🌸 Aurora, você é a estrela mais brilhante no céu da vida do Henrique. 💖",
-"💘 Henrique quer passar todos os amanheceres e entardeceres ao seu lado. ❤️",
-"🌺 Aurora, você faz o mundo do Henrique ter mais cor e mais sentido. 💕",
-"💝 Henrique nunca vai cansar de dizer o quanto ama você. ❤️",
-"🥰 Aurora, cada 'eu te amo' do Henrique vem do fundo do coração. 💖",
-"🌷 Você é a melhor companhia que Henrique poderia desejar para a vida inteira. ❤️",
-"💞 Aurora, enquanto existir um amanhã, Henrique continuará amando você. 💕",
-"✨ Henrique encontrou em você tudo o que sempre sonhou. ❤️",
-"🌹 Aurora, seu sorriso é capaz de iluminar até os dias mais difíceis do Henrique. 💖",
-"💕 Henrique ama construir lembranças ao seu lado e sonha com um futuro cheio de vocês dois. ❤️",
-"❤️ Aurora, você é e sempre será o grande amor da vida do Henrique. 💍💕"
+const mensagensAmor = [
+
+"🌹 Bom dia, meu amor. Espero que seu dia seja tão lindo quanto o sorriso que você coloca no rosto do Henrique todos os dias. Eu te amo infinitamente. ❤️",
+
+"💖 Aurora, não existe um único dia em que Henrique não agradeça por ter você na vida dele. Você é seu maior presente. ❤️",
+
+"🥹 Henrique ama cada pedacinho de você. Seu sorriso, sua voz, seu jeitinho... tudo faz o coração dele bater mais forte. 💕",
+
+"🌸 Aurora, você é o motivo pelo qual Henrique acredita que o amor verdadeiro realmente existe. ❤️",
+
+"💞 O maior sonho do Henrique é construir uma vida inteira ao seu lado e continuar fazendo você sorrir todos os dias. 💖",
+
+"❤️ Henrique só precisa de uma coisa para ser feliz: você. Todo o resto é detalhe. 🌹",
+
+"🌷 Aurora, você é o lugar onde o coração do Henrique sempre encontra paz. ❤️",
+
+"💕 Henrique se apaixonaria por você mil vezes, em qualquer vida, em qualquer universo. Você sempre seria sua escolha. 💖",
+
+"✨ Você faz Henrique querer ser uma pessoa melhor todos os dias. Obrigado por existir. ❤️",
+
+"🥰 Henrique ama quando você sorri, porque naquele momento parece que o mundo inteiro fica mais bonito. 💕",
+
+"🌹 Aurora, não importa quanto tempo passe, Henrique sempre vai olhar para você com o mesmo brilho nos olhos do primeiro dia. ❤️",
+
+"💖 Você é o pensamento mais bonito do Henrique ao acordar e a melhor lembrança antes de dormir. ❤️",
+
+"🌸 Henrique nunca imaginou que alguém pudesse fazer o coração dele transbordar tanto amor... até conhecer você. 💞",
+
+"❤️ Aurora, você é o abraço que Henrique sempre quer encontrar depois de um dia difícil. 💕",
+
+"💝 Henrique ama fazer planos para o futuro, porque em todos eles você está ao lado dele. ❤️",
+
+"🌷 O coração do Henrique sorri toda vez que lembra que tem você. 💖",
+
+"🥹 Aurora, você é muito mais do que um amor... você é a pessoa que dá sentido à vida do Henrique. ❤️",
+
+"💞 Henrique prometeu amar você todos os dias, e essa promessa fica mais forte a cada amanhecer. 💖",
+
+"🌹 Não importa onde Henrique esteja... uma parte do coração dele sempre estará com você. ❤️",
+
+"💕 Aurora, você é a melhor parte de todos os dias do Henrique. ❤️",
+
+"✨ Henrique ama ouvir sua voz, ver seu sorriso e simplesmente saber que você existe. 💖",
+
+"❤️ Se Henrique pudesse fazer um pedido para a vida inteira, pediria apenas para continuar segurando sua mão. 🌹",
+
+"🌸 Aurora, você é a definição de felicidade para Henrique. 💕",
+
+"🥰 Henrique nunca vai se cansar de dizer o quanto ama você, porque esse amor só cresce. ❤️",
+
+"💖 O tempo passa, mas o amor do Henrique por você fica cada dia maior. 🌷",
+
+"🌹 Henrique quer envelhecer ao seu lado, rir das mesmas piadas bobas e continuar chamando você de amor para sempre. ❤️",
+
+"💞 Aurora, você faz Henrique acreditar que o destino escreveu a história mais bonita quando colocou vocês dois juntos. 💖",
+
+"❤️ Henrique ama você muito mais do que qualquer palavra conseguiria explicar. 💕",
+
+"🥹 Se o coração do Henrique pudesse falar, ele repetiria o seu nome o dia inteiro. ❤️",
+
+"💍 Aurora... você sempre será o amor da vida do Henrique, hoje, amanhã e para sempre. Eu te amo infinitamente. ❤️"
+
+];
 ];
 
 // ==============================
