@@ -1,5 +1,5 @@
 // ==============================================================
-// index.js - CÓDIGO PRINCIPAL DO DISCORD BOT
+// index.js - CÓDIGO PRINCIPAL DO DISCORD BO
 // Desenvolvido para utilizar o arquivo separado "messages.js"
 // ==============================================================
 
