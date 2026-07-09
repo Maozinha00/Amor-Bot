@@ -14,7 +14,7 @@ const {
 // Importando as mensagens do arquivo separado!
 const botData = require("./messages.js");
 
-const TOKEN = process.env.TOKEN || "MTUyMDM5Njk2NTg5MDg4MzU4NA.GlEXZw.H6BdDD9HLPpjnqtjuKJil5-zDXfDQhFNEBfA38";
+const TOKEN = process.env.TOKEN;
 
 // ==============================
 // CONFIGURAÇÕES DE ID (CONFIGURADAS NO DASHBOARD)
