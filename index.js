@@ -22,7 +22,19 @@ const {
 const botData = require("./messages.js");
 
 // Obtém o token estritamente das variáveis de ambiente (Variable)
-const TOKEN = process.env.TOKEN;
+// Função para tratar o token de possíveis aspas ou espaços extras inseridos por engano no painel de controle
+function limparToken(tokenCru) {
+  if (!tokenCru) return "";
+  let tokenLimpo = tokenCru.trim();
+  // Remove aspas simples ou duplas extras no início e fim (comum em variáveis de ambiente de hospedagens)
+  if ((tokenLimpo.startsWith('"') && tokenLimpo.endsWith('"')) || 
+      (tokenLimpo.startsWith("'") && tokenLimpo.endsWith("'"))) {
+    tokenLimpo = tokenLimpo.slice(1, -1).trim();
+  }
+  return tokenLimpo;
+}
+
+const TOKEN = limparToken(process.env.TOKEN);
 
 // ==============================
 // VALIDAÇÃO DE SEGURANÇA DO TOKEN
@@ -175,53 +187,73 @@ client.on(Events.MessageCreate, async message => {
 
   // COMANDO !AMOR
   if (content === "!amor") {
-    const lista = botData.mensagensAmor;
-    const msgRandom = lista[Math.floor(Math.random() * lista.length)];
-    const dias = calcularDias();
+    try {
+      const canal = await client.channels.fetch(CANAL_AMOR_ID).catch(() => null);
+      if (!canal) {
+        return message.reply("❌ Canal de Amor não encontrado!");
+      }
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff4d88")
-      .setTitle("💖 Mensagem de Amor 💖")
-      .setDescription(
-        botData.FRASE_GRANDE +
-        "\n\n" +
-        msgRandom +
-        "\n\n💍 **Estamos juntos há:** " +
-        dias +
-        " dias ❤️"
-      )
-      .setFooter({ text: "❤️ Feito com todo amor para Aurora ❤️" })
-      .setTimestamp();
+      const lista = botData.mensagensAmor;
+      const msgRandom = lista[Math.floor(Math.random() * lista.length)];
+      const dias = calcularDias();
 
-    await message.channel.send({
-      content: `🌹 <@${AURORA_ID}> 💖`,
-      embeds: [embed]
-    });
+      const embed = new EmbedBuilder()
+        .setColor("#ff4d88")
+        .setTitle("💖 Mensagem de Amor 💖")
+        .setDescription(
+          botData.FRASE_GRANDE +
+          "\n\n" +
+          msgRandom +
+          "\n\n💍 **Estamos juntos há:** " +
+          dias +
+          " dias ❤️"
+        )
+        .setFooter({ text: "❤️ Feito com todo amor para Aurora ❤️" })
+        .setTimestamp();
 
-    await message.reply("💖 Mensagem de amor enviada com sucesso!");
+      await canal.send({
+        content: `🌹 <@${AURORA_ID}> 💖`,
+        embeds: [embed]
+      });
+
+      await message.reply("💖 Mensagem de amor enviada com sucesso no canal dedicado!");
+    } catch (error) {
+      console.error("Erro no comando !amor:", error);
+      await message.reply("❌ Ocorreu um erro ao enviar a mensagem de amor.");
+    }
   }
 
   // COMANDO !FILHOS (PEDIDO PELO CLIENTE)
   if (content === "!filhos") {
-    const lista = botData.mensagensFilhos;
-    const msgRandom = lista[Math.floor(Math.random() * lista.length)];
+    try {
+      const canal = await client.channels.fetch(CANAL_FILHOS_ID).catch(() => null);
+      if (!canal) {
+        return message.reply("❌ Canal dos Filhos não encontrado!");
+      }
 
-    const embed = new EmbedBuilder()
-      .setColor("#3498db")
-      .setTitle("👨‍👩‍👧‍👦 Mensagem para os Filhos de Papai e Mamãe 🌟")
-      .setDescription(
-        msgRandom +
-        "\n\n❤️ **Vocês são o nosso maior orgulho. O papai e a mamãe amam vocês infinitamente!**"
-      )
-      .setFooter({ text: "👨‍👩‍👧‍👦 Família Abençoada" })
-      .setTimestamp();
+      const lista = botData.mensagensFilhos;
+      const msgRandom = lista[Math.floor(Math.random() * lista.length)];
 
-    await message.channel.send({
-      content: `☀️ <@&${CARGO_FILHOS_ID}> Olhem aqui, meus amores! Papai e mamãe mandaram uma mensagem! 💕`,
-      embeds: [embed]
-    });
+      const embed = new EmbedBuilder()
+        .setColor("#3498db")
+        .setTitle("👨‍👩‍👧‍👦 Mensagem para os Filhos de Papai e Mamãe 🌟")
+        .setDescription(
+          msgRandom +
+          "\n\n❤️ **Vocês são o nosso maior orgulho. O papai e a mamãe amam vocês infinitamente!**"
+        )
+        .setFooter({ text: "👨‍👩‍👧‍👦 Família Abençoada" })
+        .setTimestamp();
 
-    await message.reply("👨‍👩‍👧‍👦 Mensagem enviada para todos os filhos com menção ao cargo!");
+      await canal.send({
+        content: `☀️ <@&${CARGO_FILHOS_ID}> Olhem aqui, meus amores! Papai e mamãe mandaram uma mensagem! 💕`,
+        embeds: [embed]
+      });
+
+      await message.reply("👨‍👩‍👧‍👦 Mensagem enviada para todos os filhos com menção ao cargo no canal dedicado!");
+    } catch (error) {
+      console.error("Erro no comando !filhos:", error);
+      await message.reply("❌ Ocorreu um erro ao enviar a mensagem para os filhos.");
+    }
   }
 });
 
