@@ -1,7 +1,14 @@
 // ==============================================================
-// index.js - CÓDIGO PRINCIPAL DO DISCORD BO
+// index.js - CÓDIGO PRINCIPAL DO DISCORD BOT
 // Desenvolvido para utilizar o arquivo separado "messages.js"
 // ==============================================================
+
+// Carrega as variáveis de ambiente do arquivo .env (se existir localmente)
+try {
+  require("dotenv").config();
+} catch (e) {
+  // Ignora se não houver o pacote dotenv instalado localmente
+}
 
 const {
   Client,
@@ -14,7 +21,22 @@ const {
 // Importando as mensagens do arquivo separado!
 const botData = require("./messages.js");
 
+// Obtém o token estritamente das variáveis de ambiente (Variable)
 const TOKEN = process.env.TOKEN;
+
+// ==============================
+// VALIDAÇÃO DE SEGURANÇA DO TOKEN
+// ==============================
+if (!TOKEN || TOKEN.trim() === "") {
+  console.error("\n❌ ======================================================= ❌");
+  console.error("  ERRO DE CONFIGURAÇÃO: A variável de ambiente TOKEN não foi encontrada!");
+  console.error("  ---------------------------------------------------------");
+  console.error("  Certifique-se de configurar a variável de ambiente TOKEN");
+  console.error("  no painel da sua hospedagem (Variables / Environment Variables)");
+  console.error("  ou no arquivo `.env` local na pasta do bot.");
+  console.error("❌ ======================================================= ❌\n");
+  process.exit(1);
+}
 
 // ==============================
 // CONFIGURAÇÕES DE ID (CONFIGURADAS NO DASHBOARD)
