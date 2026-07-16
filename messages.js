@@ -118,18 +118,46 @@ Sempre nós. ❤️
   // Mensagens para os filhos
   mensagensFilhos: [
 
-    "☀️ Bom dia, nossos amores! Que hoje seja cheio de sorrisos, brincadeiras e momentos felizes. O papai e a mamãe amam vocês mais do que qualquer palavra pode explicar. ❤️",
+[
+  "☀️ Bom dia, nossos pequenos! Esperamos que o dia de vocês seja cheio de aventuras, aprendizados e muitos sorrisos. Nunca esqueçam que vocês são o nosso maior orgulho. ❤️",
 
-    "🌈 Que o dia de vocês seja leve, divertido e cheio de descobertas. Nunca esqueçam que sempre estaremos aqui para cuidar e amar vocês. 💖",
+  "💛 Acordem com um sorriso no rosto! Cada novo dia é uma oportunidade para viver momentos incríveis. O papai e a mamãe amam vocês mais do que tudo. 🥰",
 
-    "🧸 Vocês são o maior presente que Deus colocou em nossas vidas. Tenham um dia maravilhoso, nossos pequenos. 🥰",
+  "🌼 Que Deus acompanhe cada passinho de vocês hoje, protegendo, guiando e enchendo o coração de alegria. Tenham um dia maravilhoso! 🙏❤️",
 
-    "🌸 Bom dia, nossos campeões e nossas princesas! Que a alegria acompanhe cada passo de vocês hoje. Papai e mamãe amam vocês infinitamente. ❤️",
+  "🦋 Vocês transformam nossos dias em dias mais felizes. Que hoje recebam todo o carinho e toda a felicidade que merecem. 💖",
 
-    "✨ Nunca deixem de sorrir, sonhar e acreditar em vocês. Vocês enchem nossa vida de orgulho todos os dias. 💕",
+  "🌈 Nunca deixem de acreditar na bondade, nos sonhos e na força que existe dentro de vocês. Vocês conseguem ir muito mais longe do que imaginam. ✨",
 
-    "🌟 Cada abraço de vocês faz nosso coração ficar mais feliz. Tenham um dia lindo, cheio de amor e diversão. ❤️"
+  "🐻 Bom dia, nossos tesouros! Não importa onde vocês estejam, lembrem-se de que sempre existirão dois corações batendo por vocês: o do papai e o da mamãe. ❤️",
 
+  "🌻 Hoje é mais um capítulo da linda história de vocês. Aproveitem cada momento, façam o bem e espalhem alegria por onde passarem. 💛",
+
+  "💙 Vocês são a nossa maior riqueza. Nenhum presente no mundo vale mais do que ver o sorriso de vocês todos os dias. Tenham um lindo dia! 😊",
+
+  "🌞 Que nunca faltem motivos para sorrir, brincar, aprender e sonhar. Vocês iluminam nossas vidas de um jeito que ninguém consegue explicar. ❤️",
+
+  "🎈Cada conquista de vocês enche nossos corações de orgulho. Continuem sendo essas crianças incríveis, cheias de luz e amor. 💖",
+
+  "🍀 Que hoje seja um dia cheio de boas surpresas, amizades sinceras, brincadeiras divertidas e muita felicidade. Estamos sempre com vocês. 🤗",
+
+  "✨ O mundo fica muito mais bonito porque vocês existem. Nunca deixem de ser carinhosos, humildes e felizes. O papai e a mamãe amam vocês infinitamente. ❤️",
+
+  "🌹 Se algum dia vocês tiverem dúvidas, lembrem-se de uma coisa: nunca estarão sozinhos. Nosso amor estará com vocês em todos os momentos. 💕",
+
+  "⭐ Que Deus abençoe os sonhos de vocês, fortaleça seus corações e faça deste dia um dos mais felizes. Vocês são nossa maior bênção. 🙏",
+
+  "🧸 Bom dia! A felicidade de vocês é a nossa felicidade. Que hoje seja repleto de risadas, descobertas e muito amor. Amamos vocês para sempre! ❤️",
+
+  "🌺 Nunca tenham medo de tentar, aprender e recomeçar. Cada passo de vocês será sempre motivo de orgulho para nós. 💛",
+
+  "☁️ Mesmo quando não estivermos por perto, lembrem-se de que nosso amor acompanha vocês em todos os lugares. Tenham um dia incrível! ❤️",
+
+  "🌟 Vocês são o presente mais lindo que a vida nos deu. Obrigado por fazerem nossos dias mais felizes. Que Deus cuide de vocês sempre. 💖",
+
+  "💝 O abraço de vocês é o nosso lugar favorito no mundo. Aproveitem esse novo dia com muita alegria e nunca deixem de sorrir. 🤍",
+
+  "🌸 Bom dia, nossos amores! Que hoje seja leve, feliz e cheio de momentos inesquecíveis. O papai e a mamãe estarão sempre torcendo por cada sonho de vocês. ❤️"
   ]
 
 };
