@@ -158,8 +158,4 @@ Sempre nós. ❤️
   "💝 O abraço de vocês é o nosso lugar favorito no mundo. Aproveitem esse novo dia com muita alegria e nunca deixem de sorrir. 🤍",
 
   "🌸 Bom dia, nossos amores! Que hoje seja leve, feliz e cheio de momentos inesquecíveis. O papai e a mamãe estarão sempre torcendo por cada sonho de vocês. ❤️"
-// ERRADO
-if (condicao) {
-   ...
-}
-};
+  ],
