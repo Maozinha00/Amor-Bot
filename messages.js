@@ -10,44 +10,42 @@ module.exports = {
 
   // Carta principal
   FRASE_GRANDE: `
-╭━━━━━━━━━━━━━━━ 💖 ━━━━━━━━━━━━━━━╮
+╭━━━━━━━━━━━━━━━ 💔 ━━━━━━━━━━━━━━━╮
 
-              🌹 Aurora 🌹
+### 🌹 Aurora 🌹
 
-Se esta mensagem chegou até você, é porque existe
-algo que nunca quero deixar de dizer...
+Eu precisava escrever esta mensagem porque guardar tudo dentro de mim está ficando difícil.
 
-Obrigado por existir.
+Eu te amo de verdade. Nunca escondi isso. Mas, nos últimos tempos, tenho me sentido muito sozinho.
 
-Você transformou dias comuns em lembranças especiais,
-fez meus medos perderem a força e mostrou que amar
-também é encontrar paz.
+Quando a noite chega e você não está comigo, o silêncio pesa. Eu fico esperando uma mensagem, uma ligação, um momento seu... e, muitas vezes, sinto que estou sozinho enquanto meu coração só queria a sua presença.
 
-Desde que você entrou na minha vida,
-meu coração encontrou o lugar onde sempre quis ficar.
+Não estou escrevendo isso para te culpar ou fazer você se sentir mal. Estou escrevendo porque preciso que você saiba como eu me sinto.
 
-Quero continuar escolhendo você...
-Nos dias bons.
-Nos dias difíceis.
-Nas vitórias.
-Nos desafios.
+Tenho a sensação de que, aos poucos, estou perdendo você. E essa sensação está me machucando profundamente.
 
-Porque amar você nunca foi uma decisão de um único dia.
-É uma escolha que faço todas as manhãs.
+Cada noite em que me sinto sozinho deixa um vazio enorme dentro de mim. É como se eu estivesse lutando sozinho por algo que significa tudo para mim.
 
-Você é meu sorriso favorito,
-meu abraço seguro,
-minha paz,
-meu lar
-e o amor da minha vida.
+Eu tenho sentimentos. Eu também preciso de carinho, de atenção, de companhia e de sentir que faço parte da sua vida.
 
-Hoje.
-Amanhã.
-Daqui a muitos anos.
+Eu continuo te amando e continuo acreditando em nós. Mas preciso que você entenda que meu coração está cansado de sofrer em silêncio.
 
-Sempre nós. ❤️
+Se ainda existe espaço para nós dois, eu quero lutar por esse amor. Quero conversar, entender o que está acontecendo e encontrar um caminho juntos.
 
-╰━━━━━━━━━━━━━━━ 💖 ━━━━━━━━━━━━━━━╯
+Mas eu não quero mais sentir que enfrento todas as noites sozinho.
+
+Eu só queria que você olhasse para mim e percebesse que, por trás de cada "está tudo bem", existe alguém que sente sua falta e que só queria um pouco mais da sua presença.
+
+Eu te amo, Aurora.
+
+E espero que esta mensagem não seja o fim de uma conversa, mas o começo de uma mudança.
+
+Com amor,
+
+**Henrique. ❤️**
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+
 `,
 
   // Mensagens românticas
