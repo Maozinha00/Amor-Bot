@@ -2,9 +2,14 @@
  * ====================================================================
  * BOT DISCORD OFICIAL — CLASH OF CLÃS (FIVEM / DISCORD.JS V14)
  * ====================================================================
- * EXCLUSIVO PARA O CLÃ: [HTR] HUNTERS
+ * Clã: [HTR] HUNTERS
  * Servidor (GUILD_ID): 1456655598031601727
  * Canal Enquete (CHANNEL_ID): 1515125864033943712
+ * 
+ * Funcionalidades:
+ * 1. Comando !enquete / !clash — Posta o anúncio com a data do dia.
+ * 2. Atualização Automática — Quando o jogador digita o ID FiveM, o
+ *    comando tptome atualiza na hora na mensagem do anúncio!
  * ====================================================================
  */
 
@@ -34,17 +39,17 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User]
 });
 
-// Configurações do Servidor e Clã Hunters
+// Configurações Globais
 const CONFIG = {
   GUILD_ID: process.env.GUILD_ID || "1456655598031601727",
   CHANNEL_ID: process.env.CHANNEL_ID || "1534389246868062330",
   BOT_TOKEN: process.env.DISCORD_TOKEN,
+  IS_SINGLE_CLAN_MODE: true,
   MY_CLAN_TAG: "HTR",
   MY_CLAN_NAME: "HUNTERS"
 };
 
-// Armazenamento em memória dos jogadores inscritos na lineup
-// Map<userId, { userName, ingameId }>
+// Armazenamento em memória dos jogadores da lineup
 const registeredPlayers = new Map();
 
 client.once(Events.ClientReady, (readyClient) => {
@@ -52,32 +57,40 @@ client.once(Events.ClientReady, (readyClient) => {
   console.log(`✅ BOT HUNTERS ONLINE COMO: ${readyClient.user.tag}`);
   console.log(`🏰 GUILD ID: ${CONFIG.GUILD_ID}`);
   console.log(`📢 CANAL ENQUETE: ${CONFIG.CHANNEL_ID}`);
-  console.log(`🛡️ CLÃ CONFIGURADO: [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`);
   console.log(`==================================================`);
 });
 
 /**
- * 1. COMANDO !enquete OU !clash NO CANAL
+ * 1. COMANDO !enquete OU !clash
  */
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
 
   if (message.content === '!enquete' || message.content === '!clash') {
     if (message.channelId !== CONFIG.CHANNEL_ID && message.channel.type !== 1) {
-      return message.reply(`⚠️ Use o comando no canal correto de enquetes: <#${CONFIG.CHANNEL_ID}>`);
+      return message.reply(`⚠️ Use o comando no canal de enquete: <#${CONFIG.CHANNEL_ID}>`);
     }
+
+    const todayFormatted = new Date().toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    const nowTimestamp = Math.floor(Date.now() / 1000);
 
     const embed = new EmbedBuilder()
       .setTitle(`📝 INSCRIÇÃO EXCLUSIVA — CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`)
-      .setColor(0xF59E0B) // Cor Amarelo/Âmbar
+      .setColor(0xF59E0B) // Amarelo/Âmbar
       .setDescription(
-        `🏰 **CLÃ:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n\n` +
-        `📍 **COMANDO DE PUXADA DA LINEUP (10 PLAYERS):**\n` +
+        `🏰 **CLÃ:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n` +
+        `📅 **DATA DO EVENTO:** ${todayFormatted} (<t:${nowTimestamp}:D>)\n\n` +
+        `📍 **COMANDO DE PUXADA DA LINEUP (10 PLAYERS - MUDA AUTOMÁTICO):**\n` +
         `\`\`\`tptome 1; tptome 2; tptome 3; tptome 4; tptome 5; tptome 6; tptome 7; tptome 8; tptome 9; tptome 10;\`\`\`\n\n` +
-        `⚠️ **ATENÇÃO:** Mantenha os 10 IDs numéricos atualizados para a STAFF realizar a puxada rápida.\n\n` +
-        `👇 **CLIQUE NO BOTÃO ABAIXO OU REAGA COM 👍 PARA INSERIR SEU ID NA LINEUP DO CLÃ**`
+        `⚠️ **ATENÇÃO:** Mantenha os 10 IDs corretos para evitar atrasos no evento.\n\n` +
+        `👇 **CLIQUE NO BOTÃO ABAIXO PARA GARANTIR SUA VAGA NA LINEUP**`
       )
-      .setFooter({ text: `Clash de Clãs — Bot Oficial [${CONFIG.MY_CLAN_TAG}] Hunters` })
+      .setFooter({ text: `Clash de Clãs — Bot Oficial [${CONFIG.MY_CLAN_TAG}]` })
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -97,7 +110,7 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 /**
- * 2. MONITOR DE REAÇÃO 👍 NO CANAL DA ENQUETE (1515125864033943712)
+ * 2. MONITOR DE REAÇÕES 👍 NO CANAL
  */
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (user.bot) return;
@@ -109,27 +122,27 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (reaction.message.channelId === CONFIG.CHANNEL_ID && reaction.emoji.name === '👍') {
     try {
       const dmEmbed = new EmbedBuilder()
-        .setTitle(`👍 Presença Registrada — Clã Hunters [${CONFIG.MY_CLAN_TAG}]`)
+        .setTitle(`👍 Presença Registrada — Clã [${CONFIG.MY_CLAN_TAG}]`)
         .setColor(0xF59E0B)
-        .setDescription(`Olá **${user.username}**! Você reagiu com 👍 na enquete do clã **Hunters**.\n\nClique no botão **"Garantir Vaga na Lineup"** no canal <#${CONFIG.CHANNEL_ID}> para cadastrar seu ID do FiveM.`);
+        .setDescription(`Olá **${user.username}**! Clique no botão de confirmação no canal <#${CONFIG.CHANNEL_ID}> para inserir seu ID do FiveM.`);
 
       await user.send({ embeds: [dmEmbed] });
     } catch (err) {
-      console.log(`Aviso: DMs do usuário ${user.tag} estão fechadas.`);
+      console.log(`DM fechada para ${user.tag}`);
     }
   }
 });
 
 /**
- * 3. INTERAÇÃO COM BOTÕES E FORMULÁRIO (MODAL)
+ * 3. INTERAÇÕES DE BOTÕES E FORMULÁRIO (MODAL)
  */
 client.on(Events.InteractionCreate, async (interaction) => {
   
-  // Botão de Cadastrar ID na Lineup
+  // Abrir Formulário do ID
   if (interaction.isButton() && interaction.customId === 'confirm_joia_registration') {
     const modal = new ModalBuilder()
       .setCustomId('modal_registration')
-      .setTitle(`Inscrição Lineup — [${CONFIG.MY_CLAN_TAG}] Hunters`);
+      .setTitle(`Inscrição — ${CONFIG.MY_CLAN_NAME}`);
 
     const ingameIdInput = new TextInputBuilder()
       .setCustomId('ingame_id')
@@ -145,7 +158,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await interaction.showModal(modal);
   }
 
-  // Botão para Ver Comando de Puxada
+  // Ver lista ephemeral
   if (interaction.isButton() && interaction.customId === 'view_tptome_list') {
     if (registeredPlayers.size === 0) {
       return interaction.reply({ content: '⚠️ Nenhum jogador inseriu o ID ainda.', ephemeral: true });
@@ -154,38 +167,70 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const playerList = Array.from(registeredPlayers.values());
     const tptomeIds = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
 
-    const resultText = `🏰 **CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}** (${playerList.length}/10 Jogadores):\n\n` +
-                       `📍 **COMANDO DE PUXADA PARA A STAFF:**\n` +
-                       `\`\`\`${tptomeIds}\`\`\``;
+    const resultText = `🏰 **CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}** (${playerList.length}/10 Players):\n\n` +
+                       `📍 **COMANDO DE PUXADA:**\n\`\`\`${tptomeIds}\`\`\``;
 
     await interaction.reply({ content: resultText, ephemeral: true });
   }
 
-  // Envio do ID pelo Modal
+  // Submissão do ID FiveM
   if (interaction.isModalSubmit() && interaction.customId === 'modal_registration') {
     const ingameId = interaction.fields.getTextInputValue('ingame_id').trim().replace(/\D/g, '');
 
     if (!ingameId) {
-      return interaction.reply({ content: '⚠️ Por favor informe apenas números no seu ID.', ephemeral: true });
+      return interaction.reply({ content: '⚠️ Digite apenas números no seu ID.', ephemeral: true });
     }
 
     registeredPlayers.set(interaction.user.id, {
       userId: interaction.user.id,
       userName: interaction.user.username,
-      ingameId
+      ingameId,
+      clanTag: CONFIG.MY_CLAN_TAG,
+      clanName: CONFIG.MY_CLAN_NAME
     });
 
     const playerList = Array.from(registeredPlayers.values());
     const tptomeLine = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
 
+    // ⚡ ATUALIZAÇÃO AUTOMÁTICA DA MENSAGEM DO DISCORD EM TEMPO REAL
+    if (interaction.message) {
+      try {
+        const todayFormatted = new Date().toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const nowTimestamp = Math.floor(Date.now() / 1000);
+
+        const updatedEmbed = new EmbedBuilder()
+          .setTitle(`📝 INSCRIÇÃO EXCLUSIVA — CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`)
+          .setColor(0xF59E0B)
+          .setDescription(
+            `🏰 **CLÃ:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n` +
+            `📅 **DATA DO EVENTO:** ${todayFormatted} (<t:${nowTimestamp}:D>)\n\n` +
+            `📍 **COMANDO DE PUXADA DA LINEUP (${playerList.length}/10 PLAYERS - MUDA AUTOMÁTICO):**\n` +
+            `\`\`\`${tptomeLine}\`\`\`\n\n` +
+            `⚠️ **ATENÇÃO:** Mantenha os 10 IDs corretos para evitar atrasos no evento.\n\n` +
+            `👇 **CLIQUE NO BOTÃO ABAIXO PARA GARANTIR SUA VAGA NA LINEUP**`
+          )
+          .setFooter({ text: `Clash de Clãs — Bot Oficial [${CONFIG.MY_CLAN_TAG}] • ${playerList.length}/10 Confirmados` })
+          .setTimestamp();
+
+        await interaction.message.edit({ embeds: [updatedEmbed] });
+      } catch (e) {
+        console.log('Erro ao atualizar a mensagem:', e);
+      }
+    }
+
     const replyEmbed = new EmbedBuilder()
-      .setTitle(`✅ ID ${ingameId} Cadastrado na Lineup dos Hunters [${CONFIG.MY_CLAN_TAG}]`)
+      .setTitle(`✅ ID ${ingameId} Cadastrado na Lineup de [${CONFIG.MY_CLAN_TAG}]`)
       .setColor(0x10B981)
       .setDescription(
         `**Jogador:** ${interaction.user.username}\n` +
         `**ID FiveM:** ${ingameId}\n` +
         `**Vagas Preenchidas:** ${playerList.length}/10\n\n` +
-        `📍 **Comando tptome do Clã:**\n` +
+        `📍 **Comando tptome (Atualizado na Enquete):**\n` +
         `\`\`\`${tptomeLine}\`\`\``
       );
 
@@ -193,5 +238,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// Autenticação no Discord
 client.login(CONFIG.BOT_TOKEN);
