@@ -113,7 +113,7 @@ function buildEventEmbed(mode = currentMode) {
       `🏰 **CLÃ / FACÇÃO:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n` +
       `📅 **DATA DO EVENTO:** ${todayFormatted} (<t:${nowTimestamp}:D>)\n\n` +
       `📍 **COMANDO DE PUXADA DA LINEUP (${playerList.length}/${maxTarget} PLAYERS - MUDA AUTOMÁTICO):**\n` +
-      ```${tptomeLine}```\n\n` +
+      `\`\`\`${tptomeLine}\`\`\`\n\n` +
       `⚠️ **ATENÇÃO:** Mantenha os IDs corretos para evitar atrasos no evento.\n\n` +
       `👇 **CLIQUE NO BOTÃO OU REAGA COM 👍 PARA GARANTIR SUA VAGA NA LINEUP**`
     )
@@ -383,7 +383,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         `**ID FiveM:** ${ingameId}\n` +
         `**Total Cadastrados:** ${playerList.length}\n\n` +
         `📍 **Comando tptome do Clã:**\n` +
-        ```${tptomeLine}````
+        `\`\`\`${tptomeLine}\`\`\``
       );
 
     await interaction.reply({ embeds: [replyEmbed], ephemeral: true });
@@ -441,7 +441,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const resultText = `🏰 **[${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}** (${playerList.length} Jogadores):\n\n` +
                        `📍 **COMANDO DE PUXADA PARA A STAFF:**\n` +
-                       ```${tptomeIds}```;
+                       `\`\`\`${tptomeIds}\`\`\``;
 
     await interaction.reply({ content: resultText, ephemeral: true });
   }
