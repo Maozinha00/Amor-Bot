@@ -1,248 +1,208 @@
-import express from 'express';
-import fs from 'fs';
-import {
-    Client, GatewayIntentBits, Partials, EmbedBuilder, ButtonBuilder,
-    ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, ModalBuilder,
-    TextInputBuilder, TextInputStyle, Events, PermissionsBitField, ChannelType
-} from "discord.js";
+/**
+ * ====================================================================
+ * BOT DISCORD OFICIAL — CLASH OF CLÃS (FIVEM / DISCORD.JS V14)
+ * ====================================================================
+ * Servidor (GUILD_ID): 1456655598031601727
+ * Canal Enquete (CHANNEL_ID): 1515125864033943712
+ * ====================================================================
+ */
 
-// ===============================
-// CONFIGURAÇÃO E BANCO DE DADOS
-// ===============================
-const TOKEN = process.env.DISCORD_TOKEN || process.env.TOKEN || "SEU_DISCORD_BOT_TOKEN";
+require('dotenv').config();
+const { 
+  Client, 
+  GatewayIntentBits, 
+  Partials, 
+  EmbedBuilder, 
+  ActionRowBuilder, 
+  ButtonBuilder, 
+  ButtonStyle,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  Events
+} = require('discord.js');
 
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers
+  ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User]
+});
+
+// Configurações dos IDs do Servidor e Canal
 const CONFIG = {
-    GUILD_ID: "1456655598031601727",
-    CATEGORIA_RECRUTAMENTO: "1515125869968887868", // Onde os canais de entrevista serão criados
-    CANAL_LOGS_GERAL: "",
-    CANAL_RANKING: "ID_CANAL_RANKING",
-    CARGO_STAFF: "ID_CARGO_STAFF", // Quem pode entrevistar
-    CARGO_RECRUTA: "ID_CARGO_RECRUTA",
-    CARGO_TESTE: "ID_CARGO_EM_TESTE",
-    COLOR: "#2ECC71",
-    COLOR_TRIAL: "#F1C40F",
-    FOOTER: "Hunters Recruitment System v2.0"
+  GUILD_ID: process.env.GUILD_ID || "1456655598031601727",
+  CHANNEL_ID: process.env.CHANNEL_ID || "1515125864033943712",
+  BOT_TOKEN: process.env.DISCORD_TOKEN
 };
 
-// Simulação de Banco de Dados local
-const dbPath = './database.json';
-let DB = { users: {}, recruiters: {} };
+// Armazenamento local das lineups dos clãs
+const clanData = new Map();
 
-if (fs.existsSync(dbPath)) {
-    DB = JSON.parse(fs.readFileSync(dbPath));
-}
-
-function saveDB() {
-    fs.writeFileSync(dbPath, JSON.stringify(DB, null, 4));
-}
-
-// ===============================
-// INICIALIZAÇÃO
-// ===============================
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent,
-        GatewayIntentBits.DirectMessages
-    ],
-    partials: [Partials.Channel, Partials.Message, Partials.GuildMember]
+client.once(Events.ClientReady, (readyClient) => {
+  console.log(`==================================================`);
+  console.log(`✅ BOT CLASH OF CLÃS ONLINE COMO: ${readyClient.user.tag}`);
+  console.log(`🏰 GUILD ID CONECTADO: ${CONFIG.GUILD_ID}`);
+  console.log(`📢 CANAL DE ENQUETE ATIVO: ${CONFIG.CHANNEL_ID}`);
+  console.log(`==================================================`);
 });
 
-// ===============================
-// LOGICA DE RECRUTAMENTO
-// ===============================
+/**
+ * 1. ENVIAR A MENSAGEM DE ENQUETE OFICIAL (!enquete)
+ */
+client.on(Events.MessageCreate, async (message) => {
+  if (message.author.bot) return;
 
+  if (message.content === '!enquete' || message.content === '!clash') {
+    if (message.channelId !== CONFIG.CHANNEL_ID && message.channel.type !== 1) {
+      return message.reply(`⚠️ Utilize este comando no canal correto de inscrições: <#${CONFIG.CHANNEL_ID}>`);
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle('📝 MODELO DE INSCRIÇÃO — CLASH OF CLÃS')
+      .setColor(0xF59E0B) // Amarelo/Âmbar
+      .setDescription(
+        `🏰 **CLÃ: TAG + Nome por extenso**\n` +
+        `Exemplo:\nUBC — UMBRELLA CORPORATION\n\n` +
+        `📍 **COMANDO DE PUXADA:**\n` +
+        `\`\`\`tptome 1; tptome 2; tptome 3; tptome 4; tptome 5; tptome 6; tptome 7; tptome 8; tptome 9; tptome 10;\`\`\`\n\n` +
+        `⚠️ **ATENÇÃO:** Inscrições fora do padrão ou uso incorreto do comando podem gerar atraso ou até desclassificação do clã.\n` +
+        `Siga corretamente o formato acima para confirmar a sua vaga.\n\n` +
+        `👇 **CLIQUE NO BOTÃO ABAIXO OU REAGA COM 👍 PARA CONFIRMAR A PRESENÇA DO SEU JOGADOR/CLÃ**`
+      )
+      .setFooter({ text: 'Clash de Clãs — Bot Oficial de Puxada tptome' })
+      .setTimestamp();
+
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('confirm_joia_registration')
+        .setLabel('Confirmar Presença 👍 (Joia)')
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId('view_tptome_list')
+        .setLabel('Ver Lista de Puxada (tptome)')
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    const pollMessage = await message.channel.send({ embeds: [embed], components: [row] });
+    await pollMessage.react('👍');
+  }
+});
+
+/**
+ * 2. MONITOR DE REAÇÕES 👍 NO CANAL ESPECÍFICO (1515125864033943712)
+ */
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+  if (user.bot) return;
+
+  if (reaction.partial) {
+    try { await reaction.fetch(); } catch (error) { return; }
+  }
+
+  // Verifica se a reação foi feita no canal do evento com o emoji 👍
+  if (reaction.message.channelId === CONFIG.CHANNEL_ID && reaction.emoji.name === '👍') {
+    try {
+      const dmEmbed = new EmbedBuilder()
+        .setTitle('👍 Confirmação de Presença — Clash de Clãs')
+        .setColor(0xF59E0B)
+        .setDescription(`Olá **${user.username}**! Você reagiu com 👍 na enquete do Clash de Clãs.\n\nPara cadastrar seu ID de puxada no comando \`tptome\`, clique no botão **Confirmar Presença 👍** na mensagem da enquete.`);
+
+      await user.send({ embeds: [dmEmbed] });
+    } catch (err) {
+      console.log(`Não foi possível enviar mensagem privada para ${user.tag}.`);
+    }
+  }
+});
+
+/**
+ * 3. PROCESSAMENTO DE FORMULÁRIOS (MODALS E BOTÕES)
+ */
 client.on(Events.InteractionCreate, async (interaction) => {
-    
-    // 1. Botão de Iniciar Processo (Postado pelo !painel)
-    if (interaction.isButton() && interaction.customId === 'start_recruitment') {
-        const user = DB.users[interaction.user.id];
-        
-        if (!user?.regrasConfirmadas) {
-            return interaction.reply({ 
-                content: "⚠️ Você precisa confirmar as regras no seu **PV** antes de iniciar o recrutamento!", 
-                ephemeral: true 
-            });
-        }
+  
+  if (interaction.isButton() && interaction.customId === 'confirm_joia_registration') {
+    const modal = new ModalBuilder()
+      .setCustomId('modal_registration')
+      .setTitle('Inscrição no Clash de Clãs');
 
-        const modal = new ModalBuilder()
-            .setCustomId('modal_recrutamento_completo')
-            .setTitle('Formulário de Ingresso - Hunters');
+    const clanInput = new TextInputBuilder()
+      .setCustomId('clan_tag')
+      .setLabel('TAG do Clã (Ex: UBC)')
+      .setStyle(TextInputStyle.Short)
+      .setMaxLength(10)
+      .setRequired(true);
 
-        const fields = [
-            new TextInputBuilder().setCustomId('nome_id').setLabel('Nome RP e ID').setPlaceholder('Ex: Bruno Hunter | 4502').setStyle(TextInputStyle.Short).setRequired(true),
-            new TextInputBuilder().setCustomId('idade').setLabel('Sua Idade').setPlaceholder('Ex: 22').setStyle(TextInputStyle.Short).setRequired(true),
-            new TextInputBuilder().setCustomId('exp').setLabel('Tempo de FiveM e Clãs anteriores').setStyle(TextInputStyle.Paragraph).setRequired(true),
-            new TextInputBuilder().setCustomId('tempo_diario').setLabel('Horas disponíveis por dia').setPlaceholder('Ex: 6 horas').setStyle(TextInputStyle.Short).setRequired(true),
-            new TextInputBuilder().setCustomId('recrutador').setLabel('Quem te convidou?').setStyle(TextInputStyle.Short).setRequired(true),
-        ];
+    const clanNameInput = new TextInputBuilder()
+      .setCustomId('clan_name')
+      .setLabel('Nome Extenso do Clã (Ex: UMBRELLA CORPORATION)')
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false);
 
-        modal.addComponents(fields.map(f => new ActionRowBuilder().addComponents(f)));
-        return interaction.showModal(modal);
+    const ingameIdInput = new TextInputBuilder()
+      .setCustomId('ingame_id')
+      .setLabel('Seu ID Numérico no FiveM (Ex: 42)')
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true);
+
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(clanInput),
+      new ActionRowBuilder().addComponents(clanNameInput),
+      new ActionRowBuilder().addComponents(ingameIdInput)
+    );
+
+    await interaction.showModal(modal);
+  }
+
+  if (interaction.isButton() && interaction.customId === 'view_tptome_list') {
+    if (clanData.size === 0) {
+      return interaction.reply({ content: '⚠️ Nenhum clã cadastrado até o momento.', ephemeral: true });
     }
 
-    // 2. Recebimento do Formulário -> Criação do Ticket
-    if (interaction.isModalSubmit() && interaction.customId === 'modal_recrutamento_completo') {
-        await interaction.deferReply({ ephemeral: true });
+    let resultText = '📍 **COMANDOS DE PUXADA PARA A STAFF:**\n\n';
+    clanData.forEach((clan, tag) => {
+      const ids = clan.players.map(p => `tptome ${p.ingameId};`).join(' ');
+      resultText += `🏰 **[${tag}] ${clan.clanName}** (${clan.players.length}/10 players):\n\`\`\`${ids}\`\`\`\n`;
+    });
 
-        const dados = {
-            nome: interaction.fields.getTextInputValue('nome_id'),
-            idade: interaction.fields.getTextInputValue('idade'),
-            exp: interaction.fields.getTextInputValue('exp'),
-            tempo: interaction.fields.getTextInputValue('tempo_diario'),
-            recrutador: interaction.fields.getTextInputValue('recrutador')
-        };
+    await interaction.reply({ content: resultText, ephemeral: true });
+  }
 
-        const channel = await interaction.guild.channels.create({
-            name: `recrutamento-${interaction.user.username}`,
-            type: ChannelType.GuildText,
-            parent: CONFIG.CATEGORIA_RECRUTAMENTO,
-            permissionOverwrites: [
-                { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
-                { id: interaction.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
-                { id: CONFIG.CARGO_STAFF, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
-            ],
-        });
+  if (interaction.isModalSubmit() && interaction.customId === 'modal_registration') {
+    const tag = interaction.fields.getTextInputValue('clan_tag').toUpperCase().trim();
+    const name = interaction.fields.getTextInputValue('clan_name').toUpperCase().trim() || tag;
+    const ingameId = interaction.fields.getTextInputValue('ingame_id').trim();
 
-        const embedEntrevista = new EmbedBuilder()
-            .setColor(CONFIG.COLOR)
-            .setTitle('🎯 NOVO CANDIDATO - AGUARDANDO ENTREVISTA')
-            .setDescription(`Olá <@${interaction.user.id}>, este é seu canal de entrevista. Aguarde um recrutador.`)
-            .addFields(
-                { name: '👤 Candidato', value: `${dados.nome} (Idade: ${dados.idade})`, inline: true },
-                { name: '⏰ Disponibilidade', value: dados.tempo, inline: true },
-                { name: '🤝 Convidado por', value: dados.recrutador, inline: true },
-                { name: '📖 Experiência', value: dados.exp }
-            );
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId(`app_${interaction.user.id}`).setLabel('Aprovar Recruta').setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId(`trial_${interaction.user.id}`).setLabel('Colocar em Teste').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId(`rej_${interaction.user.id}`).setLabel('Recusar').setStyle(ButtonStyle.Danger)
-        );
-
-        await channel.send({ content: `<@&${CONFIG.CARGO_STAFF}>`, embeds: [embedEntrevista], components: [row] });
-        
-        // Salva no DB
-        DB.users[interaction.user.id] = { ...DB.users[interaction.user.id], ...dados, status: 'Entrevista' };
-        saveDB();
-
-        return interaction.editReply(`✅ Canal de entrevista criado: ${channel}`);
+    if (!clanData.has(tag)) {
+      clanData.set(tag, { clanName: name, players: [] });
     }
 
-    // 3. Ações da Staff (Aprovar, Teste, Recusar)
-    if (interaction.isButton() && (interaction.customId.startsWith('app_') || interaction.customId.startsWith('trial_') || interaction.customId.startsWith('rej_'))) {
-        const [acao, alvoId] = interaction.customId.split('_');
-        const membro = await interaction.guild.members.fetch(alvoId);
-        const userDB = DB.users[alvoId];
-
-        if (acao === 'app') {
-            await membro.roles.add(CONFIG.CARGO_RECRUTA);
-            await membro.roles.remove(CONFIG.CARGO_TESTE).catch(() => {});
-            userDB.status = 'Membro';
-            
-            // Contabiliza para o recrutador
-            const recNome = userDB.recrutador.toLowerCase();
-            DB.recruiters[recNome] = (DB.recruiters[recNome] || 0) + 1;
-            
-            await interaction.channel.send(`✅ <@${alvoId}> foi aprovado como Recruta oficial!`);
-        } 
-        
-        else if (acao === 'trial') {
-            await membro.roles.add(CONFIG.CARGO_TESTE);
-            userDB.status = 'Em Teste';
-            userDB.inicioTeste = Date.now();
-            await interaction.channel.send(`🟡 <@${alvoId}> agora está em **Período de Teste** (7 dias).`);
-        }
-
-        else if (acao === 'rej') {
-            userDB.status = 'Reprovado';
-            await interaction.channel.send(`❌ Candidatura de <@${alvoId}> recusada.`);
-            setTimeout(() => interaction.channel.delete(), 5000);
-        }
-
-        saveDB();
+    const clan = clanData.get(tag);
+    if (!clan.players.some(p => p.ingameId === ingameId)) {
+      clan.players.push({
+        userId: interaction.user.id,
+        userName: interaction.user.username,
+        ingameId
+      });
     }
+
+    const tptomeLine = clan.players.map(p => `tptome ${p.ingameId};`).join(' ');
+
+    const replyEmbed = new EmbedBuilder()
+      .setTitle(`✅ Presença Confirmada — [${tag}]`)
+      .setColor(0x10B981)
+      .setDescription(
+        `**Jogador:** ${interaction.user.username} (ID: ${ingameId})\n` +
+        `**Clã:** ${tag} — ${name}\n` +
+        `**Lineup:** ${clan.players.length}/10 Jogadores Cadastrados\n\n` +
+        `📍 **Comando de Puxada Atualizado:**\n` +
+        `\`\`\`${tptomeLine}\`\`\``
+      );
+
+    await interaction.reply({ embeds: [replyEmbed], ephemeral: true });
+  }
 });
 
-// ===============================
-// COMANDOS SLASH (EXEMPLOS)
-// ===============================
-
-client.on(Events.MessageCreate, async (msg) => {
-    if (msg.author.bot) return;
-
-    // Comando para avaliar (/avaliar @user nota)
-    if (msg.content.startsWith('!avaliar')) {
-        const mention = msg.mentions.users.first();
-        const nota = msg.content.split(' ')[2];
-        if (!mention || !nota) return msg.reply("Uso: !avaliar @user 10");
-
-        if (!DB.users[mention.id]) DB.users[mention.id] = {};
-        DB.users[mention.id].nota = nota;
-        saveDB();
-        msg.reply(`⭐ Nota ${nota} atribuída a <@${mention.id}>`);
-    }
-
-    // Comando de Perfil
-    if (msg.content.startsWith('!perfil')) {
-        const mention = msg.mentions.users.first() || msg.author;
-        const u = DB.users[mention.id];
-
-        if (!u) return msg.reply("Jogador não encontrado no sistema.");
-
-        const embed = new EmbedBuilder()
-            .setColor(CONFIG.COLOR)
-            .setTitle(`📄 FICHA HUNTERS: ${u.nome || mention.username}`)
-            .addFields(
-                { name: 'Status', value: u.status || 'N/A', inline: true },
-                { name: 'Recrutador', value: u.recrutador || 'N/A', inline: true },
-                { name: 'Nota Final', value: u.nota || 'Sem nota', inline: true }
-            );
-        msg.channel.send({ embeds: [embed] });
-    }
-
-    // Comando de Ranking
-    if (msg.content === '!ranking') {
-        const sorted = Object.entries(DB.recruiters).sort((a, b) => b[1] - a[1]);
-        const lista = sorted.map((r, i) => `${i+1}º **${r[0]}**: ${r[1]} recrutas`).join('\n');
-        
-        const embed = new EmbedBuilder()
-            .setColor("#FFD700")
-            .setTitle('🏆 RANKING DE RECRUTADORES')
-            .setDescription(lista || "Nenhum recrutamento registrado.");
-        
-        msg.channel.send({ embeds: [embed] });
-    }
-
-    // Postar Painel Inicial
-    if (msg.content === '!postarrecrutamento') {
-        const embed = new EmbedBuilder()
-            .setColor(CONFIG.COLOR)
-            .setTitle('🎯 RECRUTAMENTO CLÃ HUNTERS')
-            .setDescription('Você acha que tem o que é preciso para ser um Hunter?\n\n1. Leia as regras no seu PV.\n2. Tenha microfone de qualidade.\n3. Esteja disposto a aprender.\n\nClique no botão abaixo para preencher o formulário!');
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('start_recruitment').setLabel('Quero Entrar na Hunters').setStyle(ButtonStyle.Success).setEmoji('🏹')
-        );
-
-        msg.channel.send({ embeds: [embed], components: [row] });
-    }
-});
-
-// Regras no PV (Igual ao anterior, mas salvando no DB)
-client.on(Events.InteractionCreate, async (i) => {
-    if (i.isButton() && i.customId === 'confirmar_regras') {
-        if (!DB.users[i.user.id]) DB.users[i.user.id] = {};
-        DB.users[i.user.id].regrasConfirmadas = true;
-        saveDB();
-        i.reply({ content: "✅ Regras confirmadas! Agora você pode clicar em 'Quero Entrar' no canal de recrutamento.", ephemeral: true });
-    }
-});
-
-client.login(TOKEN);
-
-// Servidor Keep-Alive
-const app = express();
-app.get('/', (req, res) => res.send('Hunters OS Online'));
-app.listen(3000);
+client.login(CONFIG.BOT_TOKEN);
