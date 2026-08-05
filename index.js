@@ -37,7 +37,7 @@ const client = new Client({
 // Configurações do Servidor e Clã Hunters
 const CONFIG = {
   GUILD_ID: process.env.GUILD_ID || "1456655598031601727",
-  CHANNEL_ID: process.env.CHANNEL_ID || "1515125864033943712",
+  CHANNEL_ID: process.env.CHANNEL_ID || "1534389246868062330",
   BOT_TOKEN: process.env.DISCORD_TOKEN,
   MY_CLAN_TAG: "HTR",
   MY_CLAN_NAME: "HUNTERS"
