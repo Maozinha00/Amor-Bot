@@ -2,6 +2,7 @@
  * ====================================================================
  * BOT DISCORD OFICIAL — CLASH OF CLÃS (FIVEM / DISCORD.JS V14)
  * ====================================================================
+ * EXCLUSIVO PARA O CLÃ: [HTR] HUNTERS
  * Servidor (GUILD_ID): 1456655598031601727
  * Canal Enquete (CHANNEL_ID): 1515125864033943712
  * ====================================================================
@@ -33,58 +34,60 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User]
 });
 
-// Configurações dos IDs do Servidor e Canal
+// Configurações do Servidor e Clã Hunters
 const CONFIG = {
   GUILD_ID: process.env.GUILD_ID || "1456655598031601727",
   CHANNEL_ID: process.env.CHANNEL_ID || "1515125864033943712",
-  BOT_TOKEN: process.env.DISCORD_TOKEN
+  BOT_TOKEN: process.env.DISCORD_TOKEN,
+  MY_CLAN_TAG: "HTR",
+  MY_CLAN_NAME: "HUNTERS"
 };
 
-// Armazenamento local das lineups dos clãs
-const clanData = new Map();
+// Armazenamento em memória dos jogadores inscritos na lineup
+// Map<userId, { userName, ingameId }>
+const registeredPlayers = new Map();
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`==================================================`);
-  console.log(`✅ BOT CLASH OF CLÃS ONLINE COMO: ${readyClient.user.tag}`);
-  console.log(`🏰 GUILD ID CONECTADO: ${CONFIG.GUILD_ID}`);
-  console.log(`📢 CANAL DE ENQUETE ATIVO: ${CONFIG.CHANNEL_ID}`);
+  console.log(`✅ BOT HUNTERS ONLINE COMO: ${readyClient.user.tag}`);
+  console.log(`🏰 GUILD ID: ${CONFIG.GUILD_ID}`);
+  console.log(`📢 CANAL ENQUETE: ${CONFIG.CHANNEL_ID}`);
+  console.log(`🛡️ CLÃ CONFIGURADO: [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`);
   console.log(`==================================================`);
 });
 
 /**
- * 1. ENVIAR A MENSAGEM DE ENQUETE OFICIAL (!enquete)
+ * 1. COMANDO !enquete OU !clash NO CANAL
  */
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
 
   if (message.content === '!enquete' || message.content === '!clash') {
     if (message.channelId !== CONFIG.CHANNEL_ID && message.channel.type !== 1) {
-      return message.reply(`⚠️ Utilize este comando no canal correto de inscrições: <#${CONFIG.CHANNEL_ID}>`);
+      return message.reply(`⚠️ Use o comando no canal correto de enquetes: <#${CONFIG.CHANNEL_ID}>`);
     }
 
     const embed = new EmbedBuilder()
-      .setTitle('📝 MODELO DE INSCRIÇÃO — CLASH OF CLÃS')
-      .setColor(0xF59E0B) // Amarelo/Âmbar
+      .setTitle(`📝 INSCRIÇÃO EXCLUSIVA — CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`)
+      .setColor(0xF59E0B) // Cor Amarelo/Âmbar
       .setDescription(
-        `🏰 **CLÃ: TAG + Nome por extenso**\n` +
-        `Exemplo:\nUBC — UMBRELLA CORPORATION\n\n` +
-        `📍 **COMANDO DE PUXADA:**\n` +
+        `🏰 **CLÃ:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n\n` +
+        `📍 **COMANDO DE PUXADA DA LINEUP (10 PLAYERS):**\n` +
         `\`\`\`tptome 1; tptome 2; tptome 3; tptome 4; tptome 5; tptome 6; tptome 7; tptome 8; tptome 9; tptome 10;\`\`\`\n\n` +
-        `⚠️ **ATENÇÃO:** Inscrições fora do padrão ou uso incorreto do comando podem gerar atraso ou até desclassificação do clã.\n` +
-        `Siga corretamente o formato acima para confirmar a sua vaga.\n\n` +
-        `👇 **CLIQUE NO BOTÃO ABAIXO OU REAGA COM 👍 PARA CONFIRMAR A PRESENÇA DO SEU JOGADOR/CLÃ**`
+        `⚠️ **ATENÇÃO:** Mantenha os 10 IDs numéricos atualizados para a STAFF realizar a puxada rápida.\n\n` +
+        `👇 **CLIQUE NO BOTÃO ABAIXO OU REAGA COM 👍 PARA INSERIR SEU ID NA LINEUP DO CLÃ**`
       )
-      .setFooter({ text: 'Clash de Clãs — Bot Oficial de Puxada tptome' })
+      .setFooter({ text: `Clash de Clãs — Bot Oficial [${CONFIG.MY_CLAN_TAG}] Hunters` })
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('confirm_joia_registration')
-        .setLabel('Confirmar Presença 👍 (Joia)')
+        .setLabel('Garantir Vaga na Lineup 👍')
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId('view_tptome_list')
-        .setLabel('Ver Lista de Puxada (tptome)')
+        .setLabel('Ver Comando tptome Atualizado')
         .setStyle(ButtonStyle.Secondary)
     );
 
@@ -94,7 +97,7 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 /**
- * 2. MONITOR DE REAÇÕES 👍 NO CANAL ESPECÍFICO (1515125864033943712)
+ * 2. MONITOR DE REAÇÃO 👍 NO CANAL DA ENQUETE (1515125864033943712)
  */
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (user.bot) return;
@@ -103,101 +106,86 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     try { await reaction.fetch(); } catch (error) { return; }
   }
 
-  // Verifica se a reação foi feita no canal do evento com o emoji 👍
   if (reaction.message.channelId === CONFIG.CHANNEL_ID && reaction.emoji.name === '👍') {
     try {
       const dmEmbed = new EmbedBuilder()
-        .setTitle('👍 Confirmação de Presença — Clash de Clãs')
+        .setTitle(`👍 Presença Registrada — Clã Hunters [${CONFIG.MY_CLAN_TAG}]`)
         .setColor(0xF59E0B)
-        .setDescription(`Olá **${user.username}**! Você reagiu com 👍 na enquete do Clash de Clãs.\n\nPara cadastrar seu ID de puxada no comando \`tptome\`, clique no botão **Confirmar Presença 👍** na mensagem da enquete.`);
+        .setDescription(`Olá **${user.username}**! Você reagiu com 👍 na enquete do clã **Hunters**.\n\nClique no botão **"Garantir Vaga na Lineup"** no canal <#${CONFIG.CHANNEL_ID}> para cadastrar seu ID do FiveM.`);
 
       await user.send({ embeds: [dmEmbed] });
     } catch (err) {
-      console.log(`Não foi possível enviar mensagem privada para ${user.tag}.`);
+      console.log(`Aviso: DMs do usuário ${user.tag} estão fechadas.`);
     }
   }
 });
 
 /**
- * 3. PROCESSAMENTO DE FORMULÁRIOS (MODALS E BOTÕES)
+ * 3. INTERAÇÃO COM BOTÕES E FORMULÁRIO (MODAL)
  */
 client.on(Events.InteractionCreate, async (interaction) => {
   
+  // Botão de Cadastrar ID na Lineup
   if (interaction.isButton() && interaction.customId === 'confirm_joia_registration') {
     const modal = new ModalBuilder()
       .setCustomId('modal_registration')
-      .setTitle('Inscrição no Clash de Clãs');
-
-    const clanInput = new TextInputBuilder()
-      .setCustomId('clan_tag')
-      .setLabel('TAG do Clã (Ex: UBC)')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(10)
-      .setRequired(true);
-
-    const clanNameInput = new TextInputBuilder()
-      .setCustomId('clan_name')
-      .setLabel('Nome Extenso do Clã (Ex: UMBRELLA CORPORATION)')
-      .setStyle(TextInputStyle.Short)
-      .setRequired(false);
+      .setTitle(`Inscrição Lineup — [${CONFIG.MY_CLAN_TAG}] Hunters`);
 
     const ingameIdInput = new TextInputBuilder()
       .setCustomId('ingame_id')
       .setLabel('Seu ID Numérico no FiveM (Ex: 42)')
       .setStyle(TextInputStyle.Short)
+      .setMaxLength(8)
       .setRequired(true);
 
     modal.addComponents(
-      new ActionRowBuilder().addComponents(clanInput),
-      new ActionRowBuilder().addComponents(clanNameInput),
       new ActionRowBuilder().addComponents(ingameIdInput)
     );
 
     await interaction.showModal(modal);
   }
 
+  // Botão para Ver Comando de Puxada
   if (interaction.isButton() && interaction.customId === 'view_tptome_list') {
-    if (clanData.size === 0) {
-      return interaction.reply({ content: '⚠️ Nenhum clã cadastrado até o momento.', ephemeral: true });
+    if (registeredPlayers.size === 0) {
+      return interaction.reply({ content: '⚠️ Nenhum jogador inseriu o ID ainda.', ephemeral: true });
     }
 
-    let resultText = '📍 **COMANDOS DE PUXADA PARA A STAFF:**\n\n';
-    clanData.forEach((clan, tag) => {
-      const ids = clan.players.map(p => `tptome ${p.ingameId};`).join(' ');
-      resultText += `🏰 **[${tag}] ${clan.clanName}** (${clan.players.length}/10 players):\n\`\`\`${ids}\`\`\`\n`;
-    });
+    const playerList = Array.from(registeredPlayers.values());
+    const tptomeIds = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
+
+    const resultText = `🏰 **CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}** (${playerList.length}/10 Jogadores):\n\n` +
+                       `📍 **COMANDO DE PUXADA PARA A STAFF:**\n` +
+                       `\`\`\`${tptomeIds}\`\`\``;
 
     await interaction.reply({ content: resultText, ephemeral: true });
   }
 
+  // Envio do ID pelo Modal
   if (interaction.isModalSubmit() && interaction.customId === 'modal_registration') {
-    const tag = interaction.fields.getTextInputValue('clan_tag').toUpperCase().trim();
-    const name = interaction.fields.getTextInputValue('clan_name').toUpperCase().trim() || tag;
-    const ingameId = interaction.fields.getTextInputValue('ingame_id').trim();
+    const ingameId = interaction.fields.getTextInputValue('ingame_id').trim().replace(/\D/g, '');
 
-    if (!clanData.has(tag)) {
-      clanData.set(tag, { clanName: name, players: [] });
+    if (!ingameId) {
+      return interaction.reply({ content: '⚠️ Por favor informe apenas números no seu ID.', ephemeral: true });
     }
 
-    const clan = clanData.get(tag);
-    if (!clan.players.some(p => p.ingameId === ingameId)) {
-      clan.players.push({
-        userId: interaction.user.id,
-        userName: interaction.user.username,
-        ingameId
-      });
-    }
+    registeredPlayers.set(interaction.user.id, {
+      userId: interaction.user.id,
+      userName: interaction.user.username,
+      ingameId
+    });
 
-    const tptomeLine = clan.players.map(p => `tptome ${p.ingameId};`).join(' ');
+    const playerList = Array.from(registeredPlayers.values());
+    const tptomeLine = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
 
     const replyEmbed = new EmbedBuilder()
-      .setTitle(`✅ Presença Confirmada — [${tag}]`)
+      .setTitle(`✅ ID ${ingameId} Cadastrado na Lineup dos Hunters [${CONFIG.MY_CLAN_TAG}]`)
       .setColor(0x10B981)
       .setDescription(
-        `**Jogador:** ${interaction.user.username} (ID: ${ingameId})\n` +
-        `**Clã:** ${tag} — ${name}\n` +
-        `**Lineup:** ${clan.players.length}/10 Jogadores Cadastrados\n\n` +
-        `📍 **Comando de Puxada Atualizado:**\n` +
+        `**Jogador:** ${interaction.user.username}\n` +
+        `**ID FiveM:** ${ingameId}\n` +
+        `**Vagas Preenchidas:** ${playerList.length}/10\n\n` +
+        `📍 **Comando tptome do Clã:**\n` +
         `\`\`\`${tptomeLine}\`\`\``
       );
 
@@ -205,4 +193,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
+// Autenticação no Discord
 client.login(CONFIG.BOT_TOKEN);
