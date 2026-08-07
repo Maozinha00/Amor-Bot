@@ -2,17 +2,13 @@
  * ====================================================================
  * BOT DISCORD OFICIAL — FIVEM / DISCORD.JS V14 (MENU SELETOR MÚLTIPLO)
  * ====================================================================
- * ID da Staff de Permissão: 1515125822795546715
+ * ID da Staff de Permissão: 1515125822795546715 / 1527812806873972838
  * 
- * Funcionalidades Incluídas:
- * 1. Menu Interativo (!menu) — Permite escolher entre:
- *    - ⚔️ CLASH OF CLÃS (!clash)
- *    - 🔴 ÁREA VERMELHA (!areavermelha)
- *    - 🏆 EVENTO ESPECIAL (!evento)
- * 2. Atualização Automática — Atualiza o embed e o comando tptome em tempo real.
- * 3. Painel Staff (!painel / !staff) — Exclusivo para ID/Cargo Staff "1515125822795546715":
- *    - 📅 Arrumar Data do Evento
- *    - 🧹 Limpeza Geral dos IDs
+ * Regras de Capacidade & Formato:
+ * - 👑 DOMINAS: Máximo 5 Pessoas (Mostra NOME DO JOGADOR e ID)
+ * - ⚔️ CLASH OF CLÃS: Máximo 10 Pessoas (Mostra COMANDO tptome e ID)
+ * - 🔴 ÁREA VERMELHA: Máximo 10 Pessoas (Mostra NOME DO JOGADOR e ID)
+ * - 🏆 EVENTO ESPECIAL: Máximo 10 Pessoas (Mostra NOME DO JOGADOR e ID)
  * ====================================================================
  */
 
@@ -49,28 +45,78 @@ const CONFIG = {
   GUILD_ID: process.env.GUILD_ID || "1456655598031601727",
   CHANNEL_ID: process.env.CHANNEL_ID || "1534389246868062330",
   STAFF_ROLE_ID: process.env.STAFF_ROLE_ID || "1515125822795546715",
-  STAFF_ROLE_ID: process.env.STAFF_ROLE_ID || "1527812806873972838",
+  STAFF_ROLE_ID_2: process.env.STAFF_ROLE_ID_2 || "1527812806873972838",
   BOT_TOKEN: process.env.DISCORD_TOKEN,
   IS_SINGLE_CLAN_MODE: true,
   MY_CLAN_TAG: process.env.MY_CLAN_TAG || "HTR",
-  MY_CLAN_NAME: process.env.MY_CLAN_NAME || "HUNTERS"
+  MY_CLAN_NAME: process.env.MY_CLAN_NAME || "HUNTERS",
+  IMAGE_URL: process.env.IMAGE_URL || "https://i.imgur.com/o8iZdLr.jpeg"
 };
 
 // Armazenamento em Memória
 let customEventDate = null;
-let currentMode = "CLASH_OF_CLAS"; // CLASH_OF_CLAS | AREA_VERMELHA | EVENTO
+let currentMode = "CLASH_OF_CLAS"; // CLASH_OF_CLAS | DOMINAS | AREA_VERMELHA | EVENTO
 const registeredPlayers = new Map();
 
 // Helper de verificação de permissão Staff (ID de usuário ou Cargo)
 function checkIsStaff(member, user) {
-  if (!CONFIG.STAFF_ROLE_ID) return true;
-  if (user && user.id === CONFIG.STAFF_ROLE_ID) return true;
-  if (member && member.roles && member.roles.cache && member.roles.cache.has(CONFIG.STAFF_ROLE_ID)) return true;
+  if (!CONFIG.STAFF_ROLE_ID && !CONFIG.STAFF_ROLE_ID_2) return true;
+  if (user && (user.id === CONFIG.STAFF_ROLE_ID || user.id === CONFIG.STAFF_ROLE_ID_2)) return true;
+  if (member && member.roles && member.roles.cache) {
+    if (member.roles.cache.has(CONFIG.STAFF_ROLE_ID) || member.roles.cache.has(CONFIG.STAFF_ROLE_ID_2)) {
+      return true;
+    }
+  }
   return false;
+}
+
+// Helper para obter os detalhes por modo
+function getModeDetails(mode = currentMode) {
+  if (mode === 'DOMINAS') {
+    return {
+      titleText: '👑 INSCRIÇÃO — DOMINAS [' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME,
+      colorHex: 0x8B5CF6,
+      maxTarget: 5,
+      categoryIcon: '👑',
+      usesTptome: false
+    };
+  } else if (mode === 'CLASH_OF_CLAS') {
+    return {
+      titleText: '📝 INSCRIÇÃO EXCLUSIVA — CLÃ [' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME,
+      colorHex: 0xF59E0B,
+      maxTarget: 10,
+      categoryIcon: '🏰',
+      usesTptome: true
+    };
+  } else if (mode === 'AREA_VERMELHA') {
+    return {
+      titleText: '🔴 INSCRIÇÃO — ÁREA VERMELHA [' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME,
+      colorHex: 0xEF4444,
+      maxTarget: 10,
+      categoryIcon: '💀',
+      usesTptome: false
+    };
+  } else if (mode === 'EVENTO') {
+    return {
+      titleText: '🏆 EVENTO ESPECIAL — [' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME,
+      colorHex: 0x10B981,
+      maxTarget: 10,
+      categoryIcon: '🎁',
+      usesTptome: false
+    };
+  }
+  return {
+    titleText: '📝 INSCRIÇÃO — [' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME,
+    colorHex: 0x3B82F6,
+    maxTarget: 10,
+    categoryIcon: '⚔️',
+    usesTptome: false
+  };
 }
 
 // Helper para construir o Embed de acordo com o Modo Selecionado
 function buildEventEmbed(mode = currentMode) {
+  const details = getModeDetails(mode);
   const todayFormatted = customEventDate || new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: '2-digit',
@@ -80,46 +126,46 @@ function buildEventEmbed(mode = currentMode) {
   const nowTimestamp = Math.floor(Date.now() / 1000);
 
   const playerList = Array.from(registeredPlayers.values());
-  const tptomeLine = playerList.length > 0 
-    ? playerList.map(p => `tptome ${p.ingameId};`).join(' ')
-    : 'tptome 1; tptome 2; tptome 3; tptome 4; tptome 5; tptome 6; tptome 7; tptome 8; tptome 9; tptome 10;';
 
-  let titleText = '';
-  let colorHex = 0xF59E0B;
-  let maxTarget = 10;
-  let categoryIcon = '⚔️';
+  let lineupContent = '';
 
-  if (mode === 'CLASH_OF_CLAS') {
-    titleText = `📝 INSCRIÇÃO EXCLUSIVA — CLÃ [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`;
-    colorHex = 0xF59E0B;
-    maxTarget = 10;
-    categoryIcon = '🏰';
-  } else if (mode === 'AREA_VERMELHA') {
-    titleText = `🔴 INSCRIÇÃO — ÁREA VERMELHA [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`;
-    colorHex = 0xEF4444;
-    maxTarget = 15;
-    categoryIcon = '💀';
-  } else if (mode === 'EVENTO') {
-    titleText = `🏆 EVENTO ESPECIAL — [${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}`;
-    colorHex = 0x10B981;
-    maxTarget = 20;
-    categoryIcon = '🎁';
+  if (details.usesTptome) {
+    // APENAS NO CLASH OF CLÃS: MOSTRA O COMANDO tptome
+    const tptomeLine = playerList.length > 0 
+      ? playerList.map(p => 'tptome ' + p.ingameId + ';').join(' ')
+      : 'tptome 1; tptome 2; tptome 3; tptome 4; tptome 5; tptome 6; tptome 7; tptome 8; tptome 9; tptome 10;';
+
+    lineupContent = '📍 **COMANDO DE PUXADA DA LINEUP (' + playerList.length + '/' + details.maxTarget + ' PLAYERS - MUDA AUTOMÁTICO):**\n' +
+                    '```' + tptomeLine + '```';
+  } else {
+    // OUTROS MODOS (DOMINAS, ÁREA VERMELHA, EVENTO): MOSTRA NOME DO JOGADOR E ID
+    let playerLines = '';
+    if (playerList.length > 0) {
+      playerLines = playerList
+        .map((p, idx) => '**' + (idx + 1) + '.** ' + p.userName + ' — **ID:** ' + p.ingameId)
+        .join('\n');
+    } else {
+      playerLines = Array.from({ length: details.maxTarget }, (_, i) => '*' + (i + 1) + '. Vaga Livre*').join('\n');
+    }
+
+    lineupContent = '📋 **JOGADORES CONFIRMADOS DA LINEUP (' + playerList.length + '/' + details.maxTarget + ' PLAYERS):**\n' +
+                    playerLines;
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(titleText)
-    .setColor(colorHex)
+    .setTitle(details.titleText)
+    .setColor(details.colorHex)
     .setDescription(
-      `${categoryIcon} **MODO ATIVO:** ${mode.replace(/_/g, ' ')}\n` +
-      `🏰 **CLÃ / FACÇÃO:** ${CONFIG.MY_CLAN_TAG} — ${CONFIG.MY_CLAN_NAME}\n` +
-      `📅 **DATA DO EVENTO:** ${todayFormatted} (<t:${nowTimestamp}:D>)\n\n` +
-      `📍 **COMANDO DE PUXADA DA LINEUP (${playerList.length}/${maxTarget} PLAYERS - MUDA AUTOMÁTICO):**\n` +
-      `\`\`\`${tptomeLine}\`\`\`\n\n` +
-      `⚠️ **ATENÇÃO:** Mantenha os IDs corretos para evitar atrasos no evento.\n\n` +
-      `👇 **CLIQUE NO BOTÃO OU REAGA COM 👍 PARA GARANTIR SUA VAGA NA LINEUP**`
+      details.categoryIcon + ' **MODO ATIVO:** ' + mode.replace(/_/g, ' ') + '\n' +
+      '🏰 **CLÃ / FACÇÃO:** ' + CONFIG.MY_CLAN_TAG + ' — ' + CONFIG.MY_CLAN_NAME + '\n' +
+      '📅 **DATA DO EVENTO:** ' + todayFormatted + ' (<t:' + nowTimestamp + ':D>)\n' +
+      '👥 **LIMITE DE VAGAS:** ' + details.maxTarget + ' Jogadores\n\n' +
+      lineupContent + '\n\n' +
+      '⚠️ **ATENÇÃO:** Mantenha os IDs corretos para evitar atrasos no evento.\n\n' +
+      '👇 **CLIQUE NO BOTÃO OU REAGA COM 👍 PARA GARANTIR SUA VAGA NA LINEUP**'
     )
-    .setFooter({ text: `Clash / FiveM — Bot Oficial [${CONFIG.MY_CLAN_TAG}] • ${playerList.length}/${maxTarget} Confirmados` })
-    .setImage('https://i.imgur.com/o8iZdLr.jpeg')
+    .setFooter({ text: 'Clash / FiveM — Bot Oficial [' + CONFIG.MY_CLAN_TAG + '] • ' + playerList.length + '/' + details.maxTarget + ' Confirmados' })
+    .setImage(CONFIG.IMAGE_URL)
     .setTimestamp();
 
   return embed;
@@ -133,7 +179,7 @@ function buildActionRow() {
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId('view_tptome_list')
-      .setLabel('Ver Comando tptome Atualizado')
+      .setLabel('Ver Lista / Comando Atualizado')
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId('open_staff_panel')
@@ -143,16 +189,16 @@ function buildActionRow() {
 }
 
 client.once(Events.ClientReady, (readyClient) => {
-  console.log(`==================================================`);
-  console.log(`✅ BOT CLASH & FIVEM ONLINE COMO: ${readyClient.user.tag}`);
-  console.log(`👑 STAFF PERMISSION ID: ${CONFIG.STAFF_ROLE_ID}`);
-  console.log(`🏰 GUILD ID: ${CONFIG.GUILD_ID}`);
-  console.log(`📢 CANAL ENQUETE: ${CONFIG.CHANNEL_ID}`);
-  console.log(`==================================================`);
+  console.log('==================================================');
+  console.log('✅ BOT CLASH & FIVEM ONLINE COMO: ' + readyClient.user.tag);
+  console.log('👑 STAFF PERMISSION ID: ' + CONFIG.STAFF_ROLE_ID);
+  console.log('🏰 GUILD ID: ' + CONFIG.GUILD_ID);
+  console.log('📢 CANAL ENQUETE: ' + CONFIG.CHANNEL_ID);
+  console.log('==================================================');
 });
 
 /**
- * COMANDOS DE MENSAGEM (!menu, !clash, !areavermelha, !evento, !enquete, !painel, !staff, !limparids, !setdata)
+ * COMANDOS DE MENSAGEM (!menu, !clash, !dominas, !areavermelha, !evento, !enquete, !painel, !staff, !limparids, !setdata)
  */
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
@@ -168,9 +214,10 @@ client.on(Events.MessageCreate, async (message) => {
       .setColor(0x3B82F6)
       .setDescription(
         'Escolha abaixo qual tipo de anúncio/lineup você deseja publicar no canal:\n\n' +
-        '1️⃣ **CLASH OF CLÃS** — Lineup oficial 10v10 para confronto de clãs.\n' +
-        '2️⃣ **ÁREA VERMELHA** — Anúncio de dominação e combate armado.\n' +
-        '3️⃣ **EVENTO** — Anúncio de evento especial com premiações.'
+        '1️⃣ **CLASH OF CLÃS** — Lineup 10v10 (Comando tptome)\n' +
+        '2️⃣ **DOMINAS** — Lineup especial (Máximo 5 Jogadores - Nome + ID)\n' +
+        '3️⃣ **ÁREA VERMELHA** — Anúncio de dominação (Máximo 10 Jogadores - Nome + ID)\n' +
+        '4️⃣ **EVENTO** — Anúncio de evento especial (Máximo 10 Jogadores - Nome + ID)'
       )
       .setFooter({ text: 'Menu de Seleção FiveM' });
 
@@ -179,18 +226,23 @@ client.on(Events.MessageCreate, async (message) => {
       .setPlaceholder('Escolha uma opção...')
       .addOptions(
         new StringSelectMenuOptionBuilder()
-          .setLabel('CLASH OF CLÃS')
-          .setDescription('Postar anúncio oficial de Clash de Clãs 10v10')
+          .setLabel('CLASH OF CLÃS (Max 10)')
+          .setDescription('Postar anúncio oficial de Clash de Clãs (Usa tptome)')
           .setValue('CLASH_OF_CLAS')
           .setEmoji('⚔️'),
         new StringSelectMenuOptionBuilder()
-          .setLabel('ÁREA VERMELHA')
-          .setDescription('Postar anúncio de ação em Área Vermelha')
+          .setLabel('DOMINAS (Max 5)')
+          .setDescription('Postar anúncio de Dominas (Usa Nome + ID)')
+          .setValue('DOMINAS')
+          .setEmoji('👑'),
+        new StringSelectMenuOptionBuilder()
+          .setLabel('ÁREA VERMELHA (Max 10)')
+          .setDescription('Postar anúncio de ação em Área Vermelha (Usa Nome + ID)')
           .setValue('AREA_VERMELHA')
           .setEmoji('🔴'),
         new StringSelectMenuOptionBuilder()
-          .setLabel('EVENTO')
-          .setDescription('Postar anúncio de Evento Especial da cidade')
+          .setLabel('EVENTO (Max 10)')
+          .setDescription('Postar anúncio de Evento Especial (Usa Nome + ID)')
           .setValue('EVENTO')
           .setEmoji('🏆')
       );
@@ -199,16 +251,18 @@ client.on(Events.MessageCreate, async (message) => {
     return message.reply({ embeds: [menuEmbed], components: [row] });
   }
 
-  // ATALHOS DIRETOS (!clash, !areavermelha, !evento, !enquete)
+  // ATALHOS DIRETOS (!clash, !dominas, !areavermelha, !evento, !enquete)
   if (
     message.content === '!clash' || 
+    message.content === '!dominas' || 
     message.content === '!areavermelha' || 
     message.content === '!evento' || 
     message.content === '!enquete'
   ) {
     if (message.content === '!clash') currentMode = 'CLASH_OF_CLAS';
+    if (message.content === '!dominas') currentMode = 'DOMINAS';
     if (message.content === '!areavermelha') currentMode = 'AREA_VERMELHA';
-    if (message.content === '!evento') currentMode = 'EVENTO';
+    if (message.content === '!evento' || message.content === '!enquete') currentMode = 'EVENTO';
 
     const embed = buildEventEmbed(currentMode);
     const row = buildActionRow();
@@ -220,18 +274,19 @@ client.on(Events.MessageCreate, async (message) => {
   // PAINEL DA STAFF DA LINEUP
   if (message.content === '!painel' || message.content === '!staff') {
     if (!checkIsStaff(message.member, message.author)) {
-      return message.reply(`❌ **Acesso Restrito.** Apenas a Staff (ID/Cargo \`${CONFIG.STAFF_ROLE_ID}\`) pode abrir o painel.`);
+      return message.reply('❌ **Acesso Restrito.** Apenas a Staff (ID/Cargo `' + CONFIG.STAFF_ROLE_ID + '`) pode abrir o painel.');
     }
 
+    const details = getModeDetails(currentMode);
     const staffEmbed = new EmbedBuilder()
       .setTitle('⚙️ PAINEL DE ADM / STAFF — FIVEM')
       .setColor(0xEF4444)
       .setDescription(
-        `👑 **Permissão:** Staff (${CONFIG.STAFF_ROLE_ID})\n` +
-        `🎯 **Modo Atual:** ${currentMode}\n` +
-        `📅 **Data Atual:** ${customEventDate || 'Padrão (Hoje)'}\n` +
-        `👥 **IDs Registrados:** ${registeredPlayers.size} jogador(es)\n\n` +
-        `Escolha uma das ações abaixo:`
+        '👑 **Permissão:** Staff (' + CONFIG.STAFF_ROLE_ID + ')\n' +
+        '🎯 **Modo Atual:** ' + currentMode + ' (Máx: ' + details.maxTarget + ' players)\n' +
+        '📅 **Data Atual:** ' + (customEventDate || 'Padrão (Hoje)') + '\n' +
+        '👥 **IDs Registrados:** ' + registeredPlayers.size + '/' + details.maxTarget + ' jogador(es)\n\n' +
+        'Escolha uma das ações abaixo:'
       );
 
     const staffRow = new ActionRowBuilder().addComponents(
@@ -245,7 +300,7 @@ client.on(Events.MessageCreate, async (message) => {
         .setStyle(ButtonStyle.Danger),
       new ButtonBuilder()
         .setCustomId('view_tptome_list')
-        .setLabel('📍 Ver tptome Atual')
+        .setLabel('📍 Ver Lista / tptome')
         .setStyle(ButtonStyle.Secondary)
     );
 
@@ -259,7 +314,7 @@ client.on(Events.MessageCreate, async (message) => {
     }
     const count = registeredPlayers.size;
     registeredPlayers.clear();
-    await message.reply(`🧹 **Limpeza Efetuada!** ${count} IDs foram removidos do sistema.`);
+    await message.reply('🧹 **Limpeza Efetuada!** ' + count + ' IDs foram removidos do sistema.');
   }
 
   // ATALHO DIRETO: !setdata <nova data>
@@ -270,7 +325,7 @@ client.on(Events.MessageCreate, async (message) => {
     const newDate = message.content.replace('!setdata ', '').trim();
     if (newDate) {
       customEventDate = newDate;
-      await message.reply(`📅 **Data do Evento Alterada para:** \`${customEventDate}\``);
+      await message.reply('📅 **Data do Evento Alterada para:** `' + customEventDate + '`');
     }
   }
 });
@@ -289,7 +344,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const row = buildActionRow();
 
     await interaction.update({ 
-      content: `✅ **Modo selecionado:** ${selectedMode}`,
+      content: '✅ **Modo selecionado:** ' + selectedMode,
       embeds: [embed], 
       components: [row] 
     });
@@ -297,9 +352,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   // Botão de Inscrição 👍
   if (interaction.isButton() && interaction.customId === 'confirm_joia_registration') {
+    const details = getModeDetails(currentMode);
+
+    // Verificar se já atingiu o limite de vagas (Ex: 5 no Dominas, 10 nos outros)
+    if (registeredPlayers.size >= details.maxTarget && !registeredPlayers.has(interaction.user.id)) {
+      return interaction.reply({ 
+        content: '⚠️ **LINEUP CHEIA!** O modo ' + currentMode.replace(/_/g, ' ') + ' já atingiu o limite máximo de ' + details.maxTarget + ' jogadores.', 
+        ephemeral: true 
+      });
+    }
+
     const modal = new ModalBuilder()
       .setCustomId('modal_registration')
-      .setTitle(`Inscrição no Clã ${CONFIG.MY_CLAN_TAG}`);
+      .setTitle('Inscrição no Clã ' + CONFIG.MY_CLAN_TAG);
 
     const ingameIdInput = new TextInputBuilder()
       .setCustomId('ingame_id')
@@ -315,18 +380,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
   // Abrir Painel Staff via Botão
   if (interaction.isButton() && interaction.customId === 'open_staff_panel') {
     if (!checkIsStaff(interaction.member, interaction.user)) {
-      return interaction.reply({ content: `❌ **Acesso Negado.** Apenas a STAFF (ID \`${CONFIG.STAFF_ROLE_ID}\`) pode usar este painel.`, ephemeral: true });
+      return interaction.reply({ content: '❌ **Acesso Negado.** Apenas a STAFF (ID `' + CONFIG.STAFF_ROLE_ID + '`) pode usar este painel.', ephemeral: true });
     }
 
+    const details = getModeDetails(currentMode);
     const staffEmbed = new EmbedBuilder()
       .setTitle('⚙️ PAINEL DE CONTROLE DA STAFF')
       .setColor(0xEF4444)
       .setDescription(
-        `👑 **Permissão:** Staff (${CONFIG.STAFF_ROLE_ID})\n` +
-        `🎯 **Modo Atual:** ${currentMode}\n` +
-        `📅 **Data Atual:** ${customEventDate || 'Padrão (Hoje)'}\n` +
-        `👥 **IDs Registrados:** ${registeredPlayers.size} jogador(es)\n\n` +
-        `Escolha uma das ações abaixo:`
+        '👑 **Permissão:** Staff (' + CONFIG.STAFF_ROLE_ID + ')\n' +
+        '🎯 **Modo Atual:** ' + currentMode + ' (Máx: ' + details.maxTarget + ')\n' +
+        '📅 **Data Atual:** ' + (customEventDate || 'Padrão (Hoje)') + '\n' +
+        '👥 **IDs Registrados:** ' + registeredPlayers.size + '/' + details.maxTarget + ' jogador(es)\n\n' +
+        'Escolha uma das ações abaixo:'
       );
 
     const staffRow = new ActionRowBuilder().addComponents(
@@ -340,7 +406,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         .setStyle(ButtonStyle.Danger),
       new ButtonBuilder()
         .setCustomId('view_tptome_list')
-        .setLabel('📍 Ver tptome Atual')
+        .setLabel('📍 Ver Lista / tptome')
         .setStyle(ButtonStyle.Secondary)
     );
 
@@ -353,6 +419,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (!ingameId) {
       return interaction.reply({ content: '⚠️ Por favor informe apenas números no seu ID.', ephemeral: true });
+    }
+
+    const details = getModeDetails(currentMode);
+
+    // Checagem de segurança de limite de vagas
+    if (registeredPlayers.size >= details.maxTarget && !registeredPlayers.has(interaction.user.id)) {
+      return interaction.reply({ 
+        content: '⚠️ **LINEUP CHEIA!** O modo ' + currentMode.replace(/_/g, ' ') + ' já atingiu o limite de ' + details.maxTarget + ' vagas.', 
+        ephemeral: true 
+      });
     }
 
     registeredPlayers.set(interaction.user.id, {
@@ -374,17 +450,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
     const playerList = Array.from(registeredPlayers.values());
-    const tptomeLine = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
+
+    let responseListFormat = '';
+    if (details.usesTptome) {
+      const tptomeLine = playerList.map(p => 'tptome ' + p.ingameId + ';').join(' ');
+      responseListFormat = '📍 **Comando tptome do Clã:**\n' + '```' + tptomeLine + '```';
+    } else {
+      const namesAndIds = playerList.map((p, idx) => (idx + 1) + '. ' + p.userName + ' — ID: ' + p.ingameId).join('\n');
+      responseListFormat = '📋 **Lista de Jogadores (Nome + ID):**\n' + '```\n' + namesAndIds + '\n```';
+    }
 
     const replyEmbed = new EmbedBuilder()
-      .setTitle(`✅ ID ${ingameId} Cadastrado na Lineup de [${CONFIG.MY_CLAN_TAG}]`)
+      .setTitle('✅ ID ' + ingameId + ' Cadastrado na Lineup [' + CONFIG.MY_CLAN_TAG + ']')
       .setColor(0x10B981)
       .setDescription(
-        `**Jogador:** ${interaction.user.username}\n` +
-        `**ID FiveM:** ${ingameId}\n` +
-        `**Total Cadastrados:** ${playerList.length}\n\n` +
-        `📍 **Comando tptome do Clã:**\n` +
-        `\`\`\`${tptomeLine}\`\`\``
+        '**Jogador:** ' + interaction.user.username + '\n' +
+        '**ID FiveM:** ' + ingameId + '\n' +
+        '**Modo:** ' + currentMode.replace(/_/g, ' ') + '\n' +
+        '**Vagas Preenchidas:** ' + playerList.length + '/' + details.maxTarget + '\n\n' +
+        responseListFormat
       );
 
     await interaction.reply({ embeds: [replyEmbed], ephemeral: true });
@@ -416,7 +500,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const newDate = interaction.fields.getTextInputValue('input_event_date').trim();
     if (newDate) {
       customEventDate = newDate;
-      await interaction.reply({ content: `📅 **Data atualizada para:** \`${customEventDate}\``, ephemeral: true });
+      await interaction.reply({ content: '📅 **Data atualizada para:** `' + customEventDate + '`', ephemeral: true });
     }
   }
 
@@ -428,21 +512,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const totalRemoved = registeredPlayers.size;
     registeredPlayers.clear();
-    await interaction.reply({ content: `🧹 **Limpeza Efetuada!** ${totalRemoved} IDs foram removidos.`, ephemeral: true });
+    await interaction.reply({ content: '🧹 **Limpeza Efetuada!** ' + totalRemoved + ' IDs foram removidos.', ephemeral: true });
   }
 
-  // Ver tptome
+  // Ver Lista / tptome
   if (interaction.isButton() && interaction.customId === 'view_tptome_list') {
     if (registeredPlayers.size === 0) {
       return interaction.reply({ content: '⚠️ Nenhum jogador inseriu o ID ainda.', ephemeral: true });
     }
 
+    const details = getModeDetails(currentMode);
     const playerList = Array.from(registeredPlayers.values());
-    const tptomeIds = playerList.map(p => `tptome ${p.ingameId};`).join(' ');
 
-    const resultText = `🏰 **[${CONFIG.MY_CLAN_TAG}] ${CONFIG.MY_CLAN_NAME}** (${playerList.length} Jogadores):\n\n` +
-                       `📍 **COMANDO DE PUXADA PARA A STAFF:**\n` +
-                       `\`\`\`${tptomeIds}\`\`\``;
+    let resultText = '🏰 **[' + CONFIG.MY_CLAN_TAG + '] ' + CONFIG.MY_CLAN_NAME + '** (' + playerList.length + '/' + details.maxTarget + ' Jogadores):\n\n';
+
+    if (details.usesTptome) {
+      const tptomeIds = playerList.map(p => 'tptome ' + p.ingameId + ';').join(' ');
+      resultText += '📍 **COMANDO DE PUXADA DA STAFF (CLASH OF CLÃS):**\n' +
+                    '```' + tptomeIds + '```';
+    } else {
+      const formattedList = playerList.map((p, idx) => (idx + 1) + '. ' + p.userName + ' — ID: ' + p.ingameId).join('\n');
+      resultText += '📋 **LISTA DE JOGADORES CONFIRMADOS (' + currentMode + '):**\n' +
+                    '```\n' + formattedList + '\n```';
+    }
 
     await interaction.reply({ content: resultText, ephemeral: true });
   }
